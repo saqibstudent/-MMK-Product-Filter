@@ -1,0 +1,68 @@
+/* mmk-product-filter/css/mmk-filter.css */
+
+/* Container styling */
+#mmk-filter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px; /* Space between elements */
+    margin-bottom: 20px;
+}
+
+/* Dropdown styling */
+#mmk-filter select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Border radius for dropdowns */
+    min-width: 150px;
+    background-color: #fff;
+    appearance: none; /* Remove default styling in some browsers */
+}
+
+/* Button styling */
+#mmk-filter button {
+    padding: 10px 20px;
+    background-color: #0073aa; /* Change this to your desired button color */
+    color: #fff;
+    border: none;
+    border-radius: 5px; /* Border radius for button */
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Button hover effect */
+#mmk-filter button:hover {
+    background-color: #005177; /* Darker shade for hover effect */
+}
+
+/* Optional: Add a border radius to the container (if desired) */
+#mmk-filter {
+    border-radius: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    #mmk-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #mmk-filter select,
+    #mmk-filter button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Add arrow icon to dropdowns */
+#mmk-filter select {
+    position: relative;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2010%2010%22><polygon%20points%3D%220%2C0%2010%2C0%205%2C10%22%20fill%3D%22%23333%22/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+}
+
+/* Hide default arrow in some browsers */
+#mmk-filter select::-ms-expand {
+    display: none;
+}
