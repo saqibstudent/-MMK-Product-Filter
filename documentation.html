@@ -266,12 +266,11 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
+    <div class="container">        <header>
             <h1>🚀 MMK Product Filter</h1>
-            <p>Advanced WordPress Plugin for WooCommerce Product Filtering</p>
+            <p>Advanced WordPress Plugin for 4-Level WooCommerce Product Filtering</p>
             <div class="badges">
-                <span class="badge">Version 1.0</span>
+                <span class="badge">Version 2.0</span>
                 <span class="badge">WordPress 5.0+</span>
                 <span class="badge">WooCommerce 3.0+</span>
                 <span class="badge">PHP 7.4+</span>
@@ -289,32 +288,34 @@
                 <li><a href="#troubleshooting">Troubleshooting</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-        </nav>
-
-        <section id="overview" class="content">
+        </nav>        <section id="overview" class="content">
             <h2>📋 Plugin Overview</h2>
-            <p>The <strong>MMK Product Filter</strong> is a sophisticated WordPress plugin designed specifically for WooCommerce stores that need advanced product filtering capabilities. It creates dependent dropdown filters for Make, Model, and Year attributes, making it perfect for automotive dealers, electronics stores, or any business with hierarchical product catalogs.</p>
+            <p>The <strong>MMK Product Filter</strong> is a sophisticated WordPress plugin designed specifically for WooCommerce stores that need advanced product filtering capabilities. It creates <strong>4-level dependent dropdown filters</strong> for Category, Make, Model, and Year attributes, making it perfect for automotive dealers, electronics stores, or any business with complex hierarchical product catalogs.</p>
             
             <div class="success">
-                <strong>Perfect for:</strong> Automotive parts, Electronics, Machinery, Tools, Appliances, or any products with hierarchical attributes.
+                <strong>Perfect for:</strong> Automotive parts, Electronics, Machinery, Tools, Appliances, or any products with hierarchical categories and attributes.
             </div>
 
             <h3>🎯 Key Benefits</h3>
             <ul>
-                <li><strong>Improved User Experience:</strong> Customers find products faster with intuitive filtering</li>
-                <li><strong>Reduced Bounce Rate:</strong> Easy navigation keeps visitors engaged</li>
+                <li><strong>Enhanced User Experience:</strong> 4-level filtering helps customers find products faster</li>
+                <li><strong>Category Integration:</strong> Leverages WooCommerce product categories as the first filter level</li>
+                <li><strong>Reduced Bounce Rate:</strong> Intuitive navigation keeps visitors engaged longer</li>
                 <li><strong>SEO Friendly:</strong> Filtered URLs are crawlable and shareable</li>
-                <li><strong>Mobile Optimized:</strong> Responsive design works on all devices</li>
-                <li><strong>Performance Optimized:</strong> AJAX loading prevents full page reloads</li>
+                <li><strong>Mobile Optimized:</strong> Responsive design works perfectly on all devices</li>
+                <li><strong>Performance Optimized:</strong> Efficient database queries using product IDs</li>
             </ul>
         </section>
 
         <section id="features" class="content">
-            <h2>✨ Features</h2>
-            <div class="feature-grid">
+            <h2>✨ Features</h2>            <div class="feature-grid">
                 <div class="feature-card">
-                    <h4>🔗 Dependent Dropdowns</h4>
-                    <p>Cascading filters that populate based on previous selections, ensuring relevant options only.</p>
+                    <h4>🏷️ Category Integration</h4>
+                    <p>First-level filtering using WooCommerce product categories for better organization.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔗 4-Level Dependent Dropdowns</h4>
+                    <p>Category → Make → Model → Year cascading filters ensuring relevant options only.</p>
                 </div>
                 <div class="feature-card">
                     <h4>⚡ AJAX Powered</h4>
@@ -322,7 +323,7 @@
                 </div>
                 <div class="feature-card">
                     <h4>🛒 WooCommerce Integration</h4>
-                    <p>Seamlessly integrates with WooCommerce product attributes and taxonomies.</p>
+                    <p>Seamlessly integrates with WooCommerce categories, product attributes and taxonomies.</p>
                 </div>
                 <div class="feature-card">
                     <h4>📱 Responsive Design</h4>
@@ -337,12 +338,8 @@
                     <p>Includes modern CSS styling that can be easily customized to match your theme.</p>
                 </div>
                 <div class="feature-card">
-                    <h4>🔍 SEO Optimized</h4>
-                    <p>Generates SEO-friendly URLs that can be shared and indexed by search engines.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>📋 Shortcode Support</h4>
-                    <p>Simple shortcode implementation allows placement anywhere on your site.</p>
+                    <h4>🚀 Performance Optimized</h4>
+                    <p>Efficient database queries using product IDs for better performance and speed.</p>
                 </div>
             </div>
         </section>
@@ -390,10 +387,17 @@ git clone https://github.com/saqibstudent/mmk-product-filter.git
 
         <section id="configuration" class="content">
             <h2>⚙️ Configuration</h2>
+              <h3>Step 1: Prepare WooCommerce Categories & Attributes</h3>
+            <p>Before configuring the plugin, ensure you have the necessary product categories and attributes set up in WooCommerce:</p>
             
-            <h3>Step 1: Prepare WooCommerce Attributes</h3>
-            <p>Before configuring the plugin, ensure you have the necessary product attributes set up in WooCommerce:</p>
-            
+            <h4>Product Categories</h4>
+            <ol>
+                <li>Go to <strong>Products → Categories</strong></li>
+                <li>Create your main product categories (e.g., "Electronics", "Automotive", "Tools")</li>
+                <li>Ensure categories have products assigned to them</li>
+            </ol>
+
+            <h4>Product Attributes</h4>
             <ol>
                 <li>Go to <strong>WooCommerce → Attributes</strong></li>
                 <li>Create attributes for your filtering needs:
@@ -418,16 +422,15 @@ git clone https://github.com/saqibstudent/mmk-product-filter.git
                     </ul>
                 </li>
                 <li>Click <strong>"Save Changes"</strong></li>
-            </ol>
-
-            <div class="warning">
-                <strong>Important:</strong> Make sure your products have these attributes assigned with appropriate values, or the filter won't display any options.
+            </ol>            <div class="warning">
+                <strong>Important:</strong> Make sure your products are assigned to categories and have these attributes assigned with appropriate values, or the filter won't display any options.
             </div>
 
             <h3>Step 3: Product Setup</h3>
             <p>For each product that should appear in filtered results:</p>
             <ol>
                 <li>Edit the product in WooCommerce</li>
+                <li>Assign the product to appropriate <strong>Categories</strong></li>
                 <li>Go to the "Attributes" tab</li>
                 <li>Add the configured attributes and select appropriate values</li>
                 <li>Save the product</li>
@@ -447,22 +450,22 @@ git clone https://github.com/saqibstudent/mmk-product-filter.git
                 <li><strong>Product Archive:</strong> Above product listings</li>
                 <li><strong>Custom Pages:</strong> Landing pages or category pages</li>
                 <li><strong>Widgets:</strong> In sidebar or footer widget areas</li>
-            </ul>
-
-            <h3>Filter Workflow</h3>
+            </ul>            <h3>Filter Workflow</h3>
             <ol>
-                <li><strong>Make Selection:</strong> User selects a make (e.g., Toyota)</li>
-                <li><strong>Model Population:</strong> Models dropdown populates with relevant options</li>
-                <li><strong>Model Selection:</strong> User selects a model (e.g., Camry)</li>
-                <li><strong>Year Population:</strong> Years dropdown populates with available years</li>
-                <li><strong>Year Selection:</strong> User selects a year (e.g., 2020)</li>
+                <li><strong>Category Selection:</strong> User selects a category (e.g., Electronics)</li>
+                <li><strong>Make Population:</strong> Makes dropdown populates with relevant options for that category</li>
+                <li><strong>Make Selection:</strong> User selects a make (e.g., Samsung)</li>
+                <li><strong>Model Population:</strong> Models dropdown populates based on category + make</li>
+                <li><strong>Model Selection:</strong> User selects a model (e.g., Galaxy)</li>
+                <li><strong>Year Population:</strong> Years dropdown populates based on category + make + model</li>
+                <li><strong>Year Selection:</strong> User selects a year (e.g., 2023)</li>
                 <li><strong>Filter Action:</strong> Filter button becomes active</li>
                 <li><strong>Results:</strong> User clicks filter and sees filtered products</li>
             </ol>
 
             <h3>URL Structure</h3>
             <p>The plugin creates SEO-friendly URLs for filtered results:</p>
-            <div class="code-block">https://yoursite.com/shop/?make=toyota&model=camry&year=2020</div>
+            <div class="code-block">https://yoursite.com/shop/?mmk_category=electronics&mmk_make=samsung&mmk_model=galaxy&mmk_year=2023</div>
             
             <div class="success">
                 <strong>SEO Benefit:</strong> These URLs can be shared, bookmarked, and indexed by search engines.
@@ -474,11 +477,14 @@ git clone https://github.com/saqibstudent/mmk-product-filter.git
             
             <h3>CSS Styling</h3>
             <p>The plugin includes <code class="code-inline">css/mmk-filter.css</code> with modern, responsive styling:</p>
-            
-            <h4>Key CSS Classes:</h4>
+              <h4>Key CSS Classes:</h4>
             <ul>
                 <li><code class="code-inline">#mmk-filter</code> - Main container</li>
-                <li><code class="code-inline">#mmk-filter select</code> - Dropdown styling</li>
+                <li><code class="code-inline">#category</code> - Category dropdown</li>
+                <li><code class="code-inline">#make</code> - Make dropdown</li>
+                <li><code class="code-inline">#model</code> - Model dropdown</li>
+                <li><code class="code-inline">#year</code> - Year dropdown</li>
+                <li><code class="code-inline">#mmk-filter select</code> - All dropdown styling</li>
                 <li><code class="code-inline">#mmk-filter button</code> - Filter button</li>
             </ul>
 
@@ -490,9 +496,13 @@ git clone https://github.com/saqibstudent/mmk-product-filter.git
             </ol>
 
             <h3>PHP Hooks & Filters</h3>
-            <p>For developers, the plugin provides several customization hooks:</p>
+            <p>For developers, the plugin provides several customization hooks:</p>            <div class="code-block">
+// Modify makes query arguments
+add_filter('mmk_makes_query_args', function($args) {
+    // Customize query arguments
+    return $args;
+});
 
-            <div class="code-block">
 // Modify model query arguments
 add_filter('mmk_models_query_args', function($args) {
     // Customize query arguments
@@ -526,8 +536,7 @@ add_filter('mmk_dropdown_html', function($html, $type) {
             <h2>🐛 Troubleshooting Guide</h2>
             
             <h3>Common Issues & Solutions</h3>
-            
-            <h4>❌ Filter Not Displaying</h4>
+              <h4>❌ Filter Not Displaying</h4>
             <div class="warning">
                 <strong>Symptoms:</strong> Shortcode shows but no dropdowns appear
                 <br><strong>Solutions:</strong>
@@ -535,6 +544,7 @@ add_filter('mmk_dropdown_html', function($html, $type) {
                     <li>Verify WooCommerce is active and working</li>
                     <li>Check if shortcode is correctly placed: <code class="code-inline">[mmk_filter]</code></li>
                     <li>Ensure attributes are configured in plugin settings</li>
+                    <li>Verify product categories exist and have products</li>
                     <li>Check browser console for JavaScript errors</li>
                 </ul>
             </div>
@@ -544,6 +554,7 @@ add_filter('mmk_dropdown_html', function($html, $type) {
                 <strong>Symptoms:</strong> Dropdowns show but have no options
                 <br><strong>Solutions:</strong>
                 <ul>
+                    <li>Verify products are assigned to categories</li>
                     <li>Verify products have the configured attributes assigned</li>
                     <li>Check attribute mapping in Settings → MMK Product Filter</li>
                     <li>Ensure attribute terms exist and are assigned to products</li>
@@ -561,17 +572,16 @@ add_filter('mmk_dropdown_html', function($html, $type) {
                     <li>Test with a default WordPress theme</li>
                     <li>Disable other plugins to check for conflicts</li>
                 </ul>
-            </div>
-
-            <h4>❌ No Products Filtered</h4>
+            </div>            <h4>❌ No Products Filtered</h4>
             <div class="warning">
                 <strong>Symptoms:</strong> Filter works but doesn't show filtered results
                 <br><strong>Solutions:</strong>
                 <ul>
                     <li>Ensure you're on the shop page or product archive</li>
-                    <li>Verify product attribute assignments match filter selections</li>
+                    <li>Verify product category and attribute assignments match filter selections</li>
                     <li>Check if other plugins are interfering with product queries</li>
                     <li>Test with WooCommerce default settings</li>
+                    <li>Verify URL parameters are correct (mmk_category, mmk_make, mmk_model, mmk_year)</li>
                 </ul>
             </div>
 
@@ -600,33 +610,32 @@ mmk-product-filter/
 │   └── mmk-filter.js        # AJAX functionality and user interactions
 ├── README.md                # Comprehensive documentation
 └── documentation.html       # This HTML documentation file
-            </div>
-
-            <h3>Core Functions</h3>
+            </div>            <h3>Core Functions</h3>
             <table>
                 <tr><th>Function</th><th>Purpose</th></tr>
-                <tr><td><code>mmk_filter_shortcode()</code></td><td>Renders the filter form HTML</td></tr>
-                <tr><td><code>mmk_get_models()</code></td><td>AJAX handler for populating model dropdown</td></tr>
-                <tr><td><code>mmk_get_years()</code></td><td>AJAX handler for populating year dropdown</td></tr>
-                <tr><td><code>mmk_filter_products_query()</code></td><td>Modifies shop page query to filter products</td></tr>
+                <tr><td><code>mmk_filter_shortcode()</code></td><td>Renders the 4-level filter form HTML (Category/Make/Model/Year)</td></tr>
+                <tr><td><code>mmk_get_makes()</code></td><td>AJAX handler for populating make dropdown based on category</td></tr>
+                <tr><td><code>mmk_get_models()</code></td><td>AJAX handler for populating model dropdown based on category + make</td></tr>
+                <tr><td><code>mmk_get_years()</code></td><td>AJAX handler for populating year dropdown based on category + make + model</td></tr>
+                <tr><td><code>mmk_filter_products_query()</code></td><td>Modifies shop page query to filter products by category and attributes</td></tr>
                 <tr><td><code>mmk_options_page()</code></td><td>Renders admin settings page</td></tr>
-            </table>
-
-            <h3>WordPress Hooks Used</h3>
+                <tr><td><code>mmk_enqueue_assets()</code></td><td>Loads CSS/JS files with localized variables</td></tr>
+            </table>            <h3>WordPress Hooks Used</h3>
             <ul>
                 <li><code class="code-inline">admin_menu</code> - Adds admin settings page</li>
                 <li><code class="code-inline">admin_init</code> - Registers plugin settings</li>
                 <li><code class="code-inline">wp_enqueue_scripts</code> - Loads CSS/JS files</li>
-                <li><code class="code-inline">wp_ajax_*</code> - Handles AJAX requests</li>
+                <li><code class="code-inline">wp_ajax_mmk_get_makes</code> - Handles AJAX requests for makes</li>
+                <li><code class="code-inline">wp_ajax_mmk_get_models</code> - Handles AJAX requests for models</li>
+                <li><code class="code-inline">wp_ajax_mmk_get_years</code> - Handles AJAX requests for years</li>
                 <li><code class="code-inline">pre_get_posts</code> - Modifies product queries</li>
-            </ul>
-
-            <h3>Database Tables Used</h3>
+            </ul>            <h3>Database Tables Used</h3>
             <p>The plugin uses standard WordPress/WooCommerce tables:</p>
             <ul>
                 <li><code class="code-inline">wp_posts</code> - Product data</li>
-                <li><code class="code-inline">wp_terms</code> - Attribute terms</li>
+                <li><code class="code-inline">wp_terms</code> - Category and attribute terms</li>
                 <li><code class="code-inline">wp_term_relationships</code> - Product-term relationships</li>
+                <li><code class="code-inline">wp_term_taxonomy</code> - Taxonomy definitions</li>
                 <li><code class="code-inline">wp_options</code> - Plugin settings storage</li>
             </ul>
         </section>
@@ -679,9 +688,8 @@ mmk-product-filter/
         <footer class="content" style="text-align: center; background: #f8f9fa;">
             <h3>📝 License & Usage</h3>
             <p>This plugin is released under the <strong>MIT License</strong>. You are free to use, modify, and distribute this plugin for personal and commercial projects.</p>
-            
-            <div style="margin: 30px 0;">
-                <p><strong>Version:</strong> 1.0 | <strong>Last Updated:</strong> June 2025</p>
+              <div style="margin: 30px 0;">
+                <p><strong>Version:</strong> 2.0 | <strong>Last Updated:</strong> June 2025</p>
                 <p>Made with ❤️ for the WordPress community</p>
             </div>
             

@@ -2,8 +2,8 @@
 /*
 Plugin Name: MMK Product Filter
 Plugin URI: https://github.com/saqibstudent/mmk-product-filter
-Description: Advanced WordPress plugin that adds dependent dropdown product filters for Make, Model, and Year in WooCommerce stores. Perfect for automotive, electronics, or any industry requiring hierarchical product filtering. Features AJAX-powered cascading dropdowns, responsive design, and SEO-friendly URLs.
-Version: 1.0
+Description: Advanced WordPress plugin that adds 4-level dependent dropdown product filters for Category, Make, Model, and Year in WooCommerce stores. Features Category integration, AJAX-powered cascading dropdowns, responsive design, and SEO-friendly URLs. Perfect for automotive, electronics, or any industry requiring hierarchical product filtering.
+Version: 2.0
 Author: Saqib Ali Khan
 Author URI: https://expertwebdeveloper.com/
 License: MIT
@@ -144,7 +144,6 @@ function mmk_options_page() {
 }
 
 
-
 // Create Shortcode
 add_shortcode( 'mmk_filter', 'mmk_filter_shortcode' );
 
@@ -160,27 +159,36 @@ function mmk_filter_shortcode() {
     ?>
 
     <div id="mmk-filter">
-        <select id="make" name="make">
-            <option value=""><?php _e( 'Select Make', 'mmk' ); ?></option>
+        <!-- Category Dropdown -->
+        <select id="category" name="category">
+            <option value=""><?php _e( 'Select Category', 'mmk' ); ?></option>
             <?php
-            $makes = get_terms( array(
-                'taxonomy' => $make_taxonomy,
+            $categories = get_terms( array(
+                'taxonomy'   => 'product_cat',
                 'hide_empty' => true,
             ));
-            foreach ( $makes as $make ) {
-                echo '<option value="' . esc_attr( $make->slug ) . '">' . esc_html( $make->name ) . '</option>';
+            foreach ( $categories as $category ) {
+                echo '<option value="' . esc_attr( $category->slug ) . '">' . esc_html( $category->name ) . '</option>';
             }
             ?>
         </select>
 
+        <!-- Make Dropdown -->
+        <select id="make" name="make" disabled>
+            <option value=""><?php _e( 'Select Make', 'mmk' ); ?></option>
+        </select>
+
+        <!-- Model Dropdown -->
         <select id="model" name="model" disabled>
             <option value=""><?php _e( 'Select Model', 'mmk' ); ?></option>
         </select>
 
+        <!-- Year Dropdown -->
         <select id="year" name="year" disabled>
             <option value=""><?php _e( 'Select Year', 'mmk' ); ?></option>
         </select>
 
+        <!-- Filter Button -->
         <button id="filter-button" disabled><?php _e( 'Filter', 'mmk' ); ?></button>
     </div>
 
@@ -189,63 +197,131 @@ function mmk_filter_shortcode() {
 }
 
 
+// Enqueue Scripts and Styles
+add_action( 'wp_enqueue_scripts', 'mmk_enqueue_assets' );
 
-// Enqueue Scripts
-add_action( 'wp_enqueue_scripts', 'mmk_enqueue_scripts' );
+function mmk_enqueue_assets() {
+   
+        // Enqueue JavaScript File
+        wp_enqueue_script( 'mmk-filter', plugins_url( 'js/mmk-filter.js', __FILE__ ), array( 'jquery' ), '6.0', true );
 
-function mmk_enqueue_scripts() {
-    // Only enqueue script where the shortcode is used
-    if ( ! is_admin() && has_shortcode( get_post( get_the_ID() )->post_content, 'mmk_filter' ) ) {
-        wp_enqueue_script( 'mmk-filter', plugins_url( 'js/mmk-filter.js', __FILE__ ), array( 'jquery' ), '1.0', true );
-
+        // Localize Script Variables
         wp_localize_script( 'mmk-filter', 'mmk_ajax', array(
-            'ajax_url' => admin_url( 'admin-ajax.php' ),
-            'shop_url' => get_permalink( wc_get_page_id( 'shop' ) ),
-            'loading_text' => __( 'Loading...', 'mmk' ),
+            'ajax_url'          => admin_url( 'admin-ajax.php' ),
+            'shop_url'          => wc_get_page_permalink( 'shop' ),
+            'loading_text'      => __( 'Loading...', 'mmk' ),
+            'select_make_text'  => __( 'Select Make', 'mmk' ),
             'select_model_text' => __( 'Select Model', 'mmk' ),
-            'select_year_text' => __( 'Select Year', 'mmk' ),
+            'select_year_text'  => __( 'Select Year', 'mmk' ),
         ));
-        if ( ! is_admin() && has_shortcode( get_post( get_the_ID() )->post_content, 'mmk_filter' ) ) {
-            wp_enqueue_style( 'mmk-filter-styles', plugins_url( 'css/mmk-filter.css', __FILE__ ) );
-        }
-    }
+
+        // Enqueue CSS File
+        wp_enqueue_style( 'mmk-filter-styles', plugins_url( 'css/mmk-filter.css', __FILE__ ) );
+   
 }
 
+// AJAX Handler for Makes
+add_action( 'wp_ajax_mmk_get_makes', 'mmk_get_makes' );
+add_action( 'wp_ajax_nopriv_mmk_get_makes', 'mmk_get_makes' );
 
+function mmk_get_makes() {
+    $category_slug = sanitize_text_field( $_POST['category'] );
+    $options = get_option( 'mmk_settings' );
+    $make_taxonomy = 'pa_' . $options['mmk_make_attribute'];
 
+    // Build tax query
+    $tax_query = array();
 
+    if ( ! empty( $category_slug ) ) {
+        $tax_query[] = array(
+            'taxonomy' => 'product_cat',
+            'field'    => 'slug',
+            'terms'    => $category_slug,
+        );
+    }
+
+    // Get products with the selected category
+    $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => -1,
+        'tax_query'      => $tax_query,
+        'fields'         => 'ids', // Only get product IDs for efficiency
+    );
+    $product_ids = get_posts( $args );
+
+    // Get makes from products
+    $makes = array();
+    if ( ! empty( $product_ids ) ) {
+        foreach ( $product_ids as $product_id ) {
+            $product_makes = wp_get_post_terms( $product_id, $make_taxonomy );
+            foreach ( $product_makes as $make ) {
+                $makes[ $make->slug ] = $make->name;
+            }
+        }
+    }
+
+    // Remove duplicates
+    $makes = array_unique( $makes );
+
+    // Build options
+    if ( ! empty( $makes ) ) {
+        $options_html = '<option value="">' . __( 'Select Make', 'mmk' ) . '</option>';
+        foreach ( $makes as $slug => $name ) {
+            $options_html .= '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
+        }
+    } else {
+        $options_html = '<option value="">' . __( 'No Makes Found', 'mmk' ) . '</option>';
+    }
+
+    echo $options_html;
+    wp_die();
+}
 
 // AJAX Handler for Models
 add_action( 'wp_ajax_mmk_get_models', 'mmk_get_models' );
 add_action( 'wp_ajax_nopriv_mmk_get_models', 'mmk_get_models' );
 
 function mmk_get_models() {
+    $category_slug = isset( $_POST['category'] ) ? sanitize_text_field( $_POST['category'] ) : '';
     $make_slug = sanitize_text_field( $_POST['make'] );
     $options = get_option( 'mmk_settings' );
     $make_taxonomy = 'pa_' . $options['mmk_make_attribute'];
     $model_taxonomy = 'pa_' . $options['mmk_model_attribute'];
 
-    // Get products with the selected make
-    $args = array(
-        'post_type' => 'product',
-        'posts_per_page' => -1,
-        'tax_query' => array(
-            array(
-                'taxonomy' => $make_taxonomy,
-                'field'    => 'slug',
-                'terms'    => $make_slug,
-            ),
+    // Build tax query
+    $tax_query = array(
+        array(
+            'taxonomy' => $make_taxonomy,
+            'field'    => 'slug',
+            'terms'    => $make_slug,
         ),
     );
-    $products = get_posts( $args );
+
+    if ( ! empty( $category_slug ) ) {
+        $tax_query[] = array(
+            'taxonomy' => 'product_cat',
+            'field'    => 'slug',
+            'terms'    => $category_slug,
+        );
+    }
+
+    // Get products with the selected make and category
+    $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => -1,
+        'tax_query'      => $tax_query,
+        'fields'         => 'ids',
+    );
+    $product_ids = get_posts( $args );
 
     // Get models from products
     $models = array();
-    foreach ( $products as $product ) {
-        $product_id = $product->ID;
-        $product_models = wp_get_post_terms( $product_id, $model_taxonomy );
-        foreach ( $product_models as $model ) {
-            $models[ $model->slug ] = $model->name;
+    if ( ! empty( $product_ids ) ) {
+        foreach ( $product_ids as $product_id ) {
+            $product_models = wp_get_post_terms( $product_id, $model_taxonomy );
+            foreach ( $product_models as $model ) {
+                $models[ $model->slug ] = $model->name;
+            }
         }
     }
 
@@ -253,22 +329,18 @@ function mmk_get_models() {
     $models = array_unique( $models );
 
     // Build options
-    
-    $options_html = '<option value="">' . __( 'Select Model', 'mmk' ) . '</option>';
-    if ( empty( $models ) ) {
-        $options_html = '<option value="">' . __( 'No Models Found', 'mmk' ) . '</option>';
-    }
-    else{
+    if ( ! empty( $models ) ) {
+        $options_html = '<option value="">' . __( 'Select Model', 'mmk' ) . '</option>';
         foreach ( $models as $slug => $name ) {
             $options_html .= '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
         }
+    } else {
+        $options_html = '<option value="">' . __( 'No Models Found', 'mmk' ) . '</option>';
     }
-    
 
     echo $options_html;
     wp_die();
 }
-
 
 
 // AJAX Handler for Years
@@ -276,6 +348,7 @@ add_action( 'wp_ajax_mmk_get_years', 'mmk_get_years' );
 add_action( 'wp_ajax_nopriv_mmk_get_years', 'mmk_get_years' );
 
 function mmk_get_years() {
+    $category_slug = isset( $_POST['category'] ) ? sanitize_text_field( $_POST['category'] ) : '';
     $make_slug = sanitize_text_field( $_POST['make'] );
     $model_slug = sanitize_text_field( $_POST['model'] );
     $options = get_option( 'mmk_settings' );
@@ -283,33 +356,46 @@ function mmk_get_years() {
     $model_taxonomy = 'pa_' . $options['mmk_model_attribute'];
     $year_taxonomy = 'pa_' . $options['mmk_year_attribute'];
 
-    // Get products with the selected make and model
-    $args = array(
-        'post_type' => 'product',
-        'posts_per_page' => -1,
-        'tax_query' => array(
-            'relation' => 'AND',
-            array(
-                'taxonomy' => $make_taxonomy,
-                'field'    => 'slug',
-                'terms'    => $make_slug,
-            ),
-            array(
-                'taxonomy' => $model_taxonomy,
-                'field'    => 'slug',
-                'terms'    => $model_slug,
-            ),
+    // Build tax query
+    $tax_query = array(
+        'relation' => 'AND',
+        array(
+            'taxonomy' => $make_taxonomy,
+            'field'    => 'slug',
+            'terms'    => $make_slug,
+        ),
+        array(
+            'taxonomy' => $model_taxonomy,
+            'field'    => 'slug',
+            'terms'    => $model_slug,
         ),
     );
-    $products = get_posts( $args );
+
+    if ( ! empty( $category_slug ) ) {
+        $tax_query[] = array(
+            'taxonomy' => 'product_cat',
+            'field'    => 'slug',
+            'terms'    => $category_slug,
+        );
+    }
+
+    // Get products with the selected make, model, and category
+    $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => -1,
+        'tax_query'      => $tax_query,
+        'fields'         => 'ids',
+    );
+    $product_ids = get_posts( $args );
 
     // Get years from products
     $years = array();
-    foreach ( $products as $product ) {
-        $product_id = $product->ID;
-        $product_years = wp_get_post_terms( $product_id, $year_taxonomy );
-        foreach ( $product_years as $year ) {
-            $years[ $year->slug ] = $year->name;
+    if ( ! empty( $product_ids ) ) {
+        foreach ( $product_ids as $product_id ) {
+            $product_years = wp_get_post_terms( $product_id, $year_taxonomy );
+            foreach ( $product_years as $year ) {
+                $years[ $year->slug ] = $year->name;
+            }
         }
     }
 
@@ -317,27 +403,24 @@ function mmk_get_years() {
     $years = array_unique( $years );
 
     // Build options
-    $options_html = '<option value="">' . __( 'Select Year', 'mmk' ) . '</option>';
-    if ( empty( $years ) ) {
-        $options_html = '<option value="">' . __( 'No Years Found', 'mmk' ) . '</option>';
-    }
-    else{
+    if ( ! empty( $years ) ) {
+        $options_html = '<option value="">' . __( 'Select Year', 'mmk' ) . '</option>';
         foreach ( $years as $slug => $name ) {
             $options_html .= '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
         }
+    } else {
+        $options_html = '<option value="">' . __( 'No Years Found', 'mmk' ) . '</option>';
     }
 
     echo $options_html;
     wp_die();
 }
 
-
-
 // Filter Products on Shop Page
 add_action( 'pre_get_posts', 'mmk_filter_products_query' );
 
 function mmk_filter_products_query( $query ) {
-    if ( ! is_admin() && $query->is_main_query() && is_post_type_archive( 'product' ) ) {
+    if ( ! is_admin() && $query->is_main_query() && ( is_shop() || is_post_type_archive( 'product' ) ) ) {
         $options = get_option( 'mmk_settings' );
         $make_taxonomy = 'pa_' . $options['mmk_make_attribute'];
         $model_taxonomy = 'pa_' . $options['mmk_model_attribute'];
@@ -345,8 +428,17 @@ function mmk_filter_products_query( $query ) {
 
         $tax_query = array();
 
-        if ( isset( $_GET['make'] ) && $_GET['make'] != '' ) {
-            $make = sanitize_text_field( $_GET['make'] );
+        if ( isset( $_GET['mmk_category'] ) && $_GET['mmk_category'] != '' ) {
+            $category = sanitize_text_field( $_GET['mmk_category'] );
+            $tax_query[] = array(
+                'taxonomy' => 'product_cat',
+                'field'    => 'slug',
+                'terms'    => $category,
+            );
+        }
+
+        if ( isset( $_GET['mmk_make'] ) && $_GET['mmk_make'] != '' ) {
+            $make = sanitize_text_field( $_GET['mmk_make'] );
             $tax_query[] = array(
                 'taxonomy' => $make_taxonomy,
                 'field'    => 'slug',
@@ -354,8 +446,8 @@ function mmk_filter_products_query( $query ) {
             );
         }
 
-        if ( isset( $_GET['model'] ) && $_GET['model'] != '' ) {
-            $model = sanitize_text_field( $_GET['model'] );
+        if ( isset( $_GET['mmk_model'] ) && $_GET['mmk_model'] != '' ) {
+            $model = sanitize_text_field( $_GET['mmk_model'] );
             $tax_query[] = array(
                 'taxonomy' => $model_taxonomy,
                 'field'    => 'slug',
@@ -363,8 +455,8 @@ function mmk_filter_products_query( $query ) {
             );
         }
 
-        if ( isset( $_GET['year'] ) && $_GET['year'] != '' ) {
-            $year = sanitize_text_field( $_GET['year'] );
+        if ( isset( $_GET['mmk_year'] ) && $_GET['mmk_year'] != '' ) {
+            $year = sanitize_text_field( $_GET['mmk_year'] );
             $tax_query[] = array(
                 'taxonomy' => $year_taxonomy,
                 'field'    => 'slug',

@@ -1,22 +1,24 @@
 # MMK Product Filter - WordPress Plugin
 
-A powerful WordPress plugin that adds dependent dropdown product filters for Make, Model, and Year in WooCommerce stores. Perfect for automotive, electronics, or any industry requiring hierarchical product filtering.
+A powerful WordPress plugin that adds **4-level dependent dropdown product filters** for Category, Make, Model, and Year in WooCommerce stores. Perfect for automotive, electronics, or any industry requiring advanced hierarchical product filtering.
 
-![Version](https://img.shields.io/badge/version-1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0-blue.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-5.0%2B-blue.svg)
 ![WooCommerce](https://img.shields.io/badge/WooCommerce-3.0%2B-purple.svg)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4.svg)
 
 ## 🚀 Features
 
-- **Dependent Dropdown Filtering**: Cascading dropdowns that filter based on previous selections
+- **4-Level Dependent Filtering**: Category → Make → Model → Year cascading dropdowns
+- **Category Integration**: Works with WooCommerce product categories as the first filter level
 - **AJAX-Powered**: Smooth, fast filtering without page reloads
-- **WooCommerce Integration**: Seamlessly works with WooCommerce product attributes
+- **WooCommerce Integration**: Seamlessly works with WooCommerce product attributes and categories
 - **Responsive Design**: Mobile-friendly interface that works on all devices
 - **Easy Configuration**: Simple admin panel to map your product attributes
 - **Shortcode Support**: Easy implementation with `[mmk_filter]` shortcode
 - **Customizable Styling**: Includes CSS for easy customization
 - **SEO Friendly**: URL parameters for filtered results support direct linking
+- **Performance Optimized**: Efficient queries using product IDs for better performance
 
 ## 📋 Requirements
 
@@ -45,9 +47,9 @@ A powerful WordPress plugin that adds dependent dropdown product filters for Mak
 
 ## ⚙️ Configuration
 
-### Step 1: Create Product Attributes
-1. Go to WooCommerce → Attributes
-2. Create attributes for:
+### Step 1: Create Product Categories & Attributes
+1. **Categories**: Go to Products → Categories and create your main product categories
+2. **Attributes**: Go to WooCommerce → Attributes and create attributes for:
    - Make (e.g., "Brand", "Manufacturer")
    - Model (e.g., "Model", "Series")
    - Year (e.g., "Year", "Model Year")
@@ -61,7 +63,8 @@ A powerful WordPress plugin that adds dependent dropdown product filters for Mak
 3. Save settings
 
 ### Step 3: Add Products
-Ensure your products have the mapped attributes assigned with appropriate values.
+1. Assign products to appropriate categories
+2. Ensure your products have the mapped attributes assigned with appropriate values
 
 ## 📖 Usage
 
@@ -79,15 +82,16 @@ Add the shortcode anywhere you want the filter to appear:
 - Widget areas
 
 ### Filter Behavior
-1. **Make Selection**: Choose a make to populate model dropdown
-2. **Model Selection**: Choose a model to populate year dropdown
-3. **Year Selection**: Enables the filter button
-4. **Filter**: Redirects to shop page with filtered results
+1. **Category Selection**: Choose a category to populate make dropdown
+2. **Make Selection**: Choose a make to populate model dropdown
+3. **Model Selection**: Choose a model to populate year dropdown
+4. **Year Selection**: Enables the filter button
+5. **Filter**: Redirects to shop page with filtered results
 
 ### URL Parameters
 The plugin creates SEO-friendly URLs:
 ```
-yoursite.com/shop/?make=toyota&model=camry&year=2020
+yoursite.com/shop/?mmk_category=electronics&mmk_make=samsung&mmk_model=galaxy&mmk_year=2023
 ```
 
 ## 🎨 Customization
@@ -120,16 +124,18 @@ add_filter('mmk_dropdown_html', 'your_custom_function');
 
 ### Backend Architecture
 1. **Settings API**: Uses WordPress Settings API for configuration
-2. **AJAX Handlers**: Custom AJAX endpoints for dynamic dropdowns
+2. **AJAX Handlers**: Custom AJAX endpoints for dynamic dropdowns (Categories → Makes → Models → Years)
 3. **Query Modification**: Hooks into WooCommerce product queries
-4. **Taxonomy Integration**: Works with WooCommerce product attributes
+4. **Taxonomy Integration**: Works with WooCommerce product categories and attributes
+5. **Performance Optimization**: Uses product IDs for efficient database queries
 
 ### Frontend Flow
-1. Make dropdown populated from WooCommerce attributes
-2. AJAX call loads models based on selected make
-3. AJAX call loads years based on selected make + model
-4. Filter button redirects with URL parameters
-5. Shop page filters products using tax_query
+1. Category dropdown populated from WooCommerce categories
+2. AJAX call loads makes based on selected category
+3. AJAX call loads models based on selected category + make
+4. AJAX call loads years based on selected category + make + model
+5. Filter button redirects with URL parameters
+6. Shop page filters products using tax_query with category and attribute filters
 
 ## 🛠️ Development
 
@@ -146,10 +152,11 @@ mmk-product-filter/
 ```
 
 ### Key Functions
-- `mmk_filter_shortcode()`: Renders the filter form
-- `mmk_get_models()`: AJAX handler for model dropdown
-- `mmk_get_years()`: AJAX handler for year dropdown
-- `mmk_filter_products_query()`: Filters shop page products
+- `mmk_filter_shortcode()`: Renders the 4-level filter form (Category/Make/Model/Year)
+- `mmk_get_makes()`: AJAX handler for make dropdown based on category
+- `mmk_get_models()`: AJAX handler for model dropdown based on category + make
+- `mmk_get_years()`: AJAX handler for year dropdown based on category + make + model
+- `mmk_filter_products_query()`: Filters shop page products using category and attribute filters
 
 ## 🐛 Troubleshooting
 
@@ -159,11 +166,18 @@ mmk-product-filter/
 - Verify shortcode placement: `[mmk_filter]`
 - Check if WooCommerce is active
 - Ensure attributes are configured
+- Verify product categories exist
 
 **Dropdowns empty:**
 - Verify attribute mapping in plugin settings
 - Ensure products have attribute values assigned
 - Check attribute visibility settings
+- Ensure products are assigned to categories
+
+**Category dropdown empty:**
+- Check if product categories exist
+- Ensure categories have products assigned
+- Verify categories are not empty
 
 **AJAX not working:**
 - Check browser console for JavaScript errors
@@ -202,9 +216,16 @@ Contributions are welcome! Please:
 
 ## 📝 Changelog
 
+### Version 2.0
+- **NEW**: Added Category as first filter level
+- **ENHANCED**: 4-level dependent filtering (Category → Make → Model → Year)
+- **IMPROVED**: Performance optimization using product IDs
+- **UPDATED**: URL parameters now include category (mmk_category, mmk_make, mmk_model, mmk_year)
+- **ENHANCED**: Better AJAX error handling and loading states
+
 ### Version 1.0
 - Initial release
-- Dependent dropdown functionality
+- 3-level dependent dropdown functionality (Make → Model → Year)
 - AJAX-powered filtering
 - Responsive design
 - Admin configuration panel
